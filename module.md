@@ -11,25 +11,27 @@ I. Utilities to Manipulate Kernel Modules
 1. lsmod – List Modules that Loaded Already
 
 lsmod command will list modules that are already loaded in the kernel as shown beblow.
+```
  # lsmod  
  Module         Size Used by  
  ppp_deflate      12806 0   
  zlib_deflate      26445 1 ppp_deflate  
  bsd_comp        12785 0   
  ..  
-
+```
 
 
 2. insmod – Insert Module into Kernel
 insmod command will insert a new module into the kernel as shown below.
-
+```
  # insmod /lib/modules/3.5.0-19-generic/kernel/fs/squashfs/squashfs.ko  
  # lsmod | grep "squash"  
  squashfs        35834 0  
-
+```
 
 
 3. modinfo – Display Module Info
+```
 modinfo command will display information about a kernel module as shown below.
  # modinfo /lib/modules/3.5.0-19-generic/kernel/fs/squashfs/squashfs.ko  
  filename:    /lib/modules/3.5.0-19-generic/kernel/fs/squashfs/squashfs.ko  
@@ -40,12 +42,14 @@ modinfo command will display information about a kernel module as shown below.
  depends:      
  intree:     Y  
  vermagic:    3.5.0-19-generic SMP mod_unload modversions 686  
-
+```
 
 4. rmmod – Remove Module from Kernel
 rmmod command will remove a module from the kernel.
 You cannot remove a module which is already used by any program.
+```
  # rmmod squashfs.ko  
+```
 
 5. modprobe – Add or Remove modules from the kernel
 modprobe is an intelligent command which will load/unload modules based on the dependency between modules. Refer to modprobe commands for more detailed examples.
@@ -56,12 +60,15 @@ II. Write a Simple Hello World Kernel Module
 
 1. Installing the linux headers
 You need to install the linux-headers-.. first as shown below. Depending on your distro, use apt-get or yum.
+```
  # apt-get install build-essential linux-headers-$(uname -r)  
+```
 
 2. Hello World Module Source Code
 
 Next, create the following hello.c module in C programming language.
 
+```
  #include <linux/module.h>  // included for all kernel modules  
  #include <linux/kernel.h>  // included for KERN_INFO  
  #include <linux/init.h>   // included for __init and __exit macros  
@@ -79,22 +86,29 @@ Next, create the following hello.c module in C programming language.
  }  
  module_init(hello_init);  
  module_exit(hello_cleanup);  
-
+```
 
 
 Warning: All kernel modules will operate on kernel space, a highly privileged mode. So be careful with what you write in a kernel module.
+
 3. Create Makefile to Compile Kernel Module
 
 The following makefile can be used to compile the above basic hello world kernel module.
+
+
+```
  obj-m += hello.o  
  all:  
    make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules  
  clean:  
    make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean  
-
+```
 
 
 Use the make command to compile hello world kernel module as shown below.
+
+
+```
  # make  
  make -C /lib/modules/3.5.0-19-generic/build M=/home/lakshmanan/a modules  
  make[1]: Entering directory `/usr/src/linux-headers-3.5.0-19-generic'  
@@ -104,20 +118,23 @@ Use the make command to compile hello world kernel module as shown below.
   CC   /home/lakshmanan/a/hello.mod.o  
   LD [M] /home/lakshmanan/a/hello.ko  
  make[1]: Leaving directory `/usr/src/linux-headers-3.5.0-19-generic'  
-
+```
 
 
 The above will create hello.ko file, which is our sample Kernel module.
 4. Insert or Remove the Sample Kernel Module
 
 Now that we have our hello.ko file, we can insert this module to the kernel by using insmod command as shown below.
+
+
+```
  # insmod hello.ko  
  # dmesg | tail -1  
  [ 8394.731865] Hello world!  
  # rmmod hello.ko  
  # dmesg | tail -1  
  [ 8707.989819] Cleaning up module.  
-
+```
 
 
 When a module is inserted into the kernel, the module_init macro will be invoked, which will call the function hello_init. Similarly, when the module is removed with rmmod, module_exit macro will be invoked, which will call the hello_exit. Using dmesg command, we can see the output from the sample Kernel module. Please note that printk is a function which is defined in kernel, and it behaves similar to the printf in the IO library. Remember that you cannot use any of the library functions from the kernel module. Now you have learned the basics to create your own Linux Kernel module.
