@@ -1,1 +1,0 @@
-# Write-Your-Own-Linux-Kernel-Module-with-a-Simple-Example
