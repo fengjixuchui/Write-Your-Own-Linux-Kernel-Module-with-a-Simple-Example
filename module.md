@@ -1,4 +1,3 @@
-![image](https://github.com/nu11secur1ty/Write-Your-Own-Linux-Kernel-Module-with-a-Simple-Example/blob/master/module.gif)
 #What are kernel modules?
 
 Kernel modules are piece of code, that can be loaded and unloaded from kernel on demand.
